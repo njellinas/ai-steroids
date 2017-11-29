@@ -10,9 +10,9 @@ class QLearn:
 
     def matchBucket(value, buckets):
         if value < buckets[0]:
-            return None
+            return 0  # None
         elif value > buckets[1] - buckets[0] + buckets[-1]:
-            return None
+            return len(buckets) - 1  # None
         else:
             idxes = list(range(len(buckets)))
             i = bisect(buckets, value) - 1
