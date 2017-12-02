@@ -9,7 +9,9 @@ class QLearn:
             return [min + k * (max - min) / buckets for k in range(buckets)]
 
     def matchBucket(value, buckets):
-        if value < buckets[0]:
+        if len(buckets) == 1:
+            return 0
+        elif value < buckets[0]:
             return 0  # None
         elif value > buckets[1] - buckets[0] + buckets[-1]:
             return len(buckets) - 1  # None

@@ -8,14 +8,14 @@ inputs: [x, x', theta, theta']
 output: 1 = right, 0 = left
 '''
 
-env = gym.make('CartPole-v1')
+env = gym.make('CartPole-v0')
 
-MAX_T = 250
+MAX_T = 200
 env._max_episode_steps = MAX_T
 
-NUM_EPISODES = 1000
+NUM_EPISODES = 10000
 
-gamma = 0.9
+gamma = 0.99
 
 MIN_DELTA = 0.01
 def delta(t):
@@ -41,15 +41,15 @@ def log_message(s):
     if LOG:
         print(s)
 
-TRAIN = True * False
+TRAIN = True #* False #**************************************************************************
 LOAD_PRETRAINED = True
 
 RENDER = False
 
 bucketed_states = list()
-num_buckets = [2, 2, 14, 6]
-mins = [-10, -10, -0.5, -1.0]
-maxes = [10, 10, 0.5, 1.0]
+num_buckets = [2, 2, 6, 4]
+mins = [-2.0, -0.5, -0.21, -1.0]
+maxes = [2.0, 0.5, 0.21, 1.0]
 
 observation_space_dimensionality = env.observation_space.shape[0]
 for i_dimension in range(observation_space_dimensionality):
@@ -64,9 +64,14 @@ if LOAD_PRETRAINED:
         pass
 
 if TRAIN:
+    scores = 0
     for i_episode in range(NUM_EPISODES):
         if i_episode % 100 == 0:
             print('ep {}'.format(i_episode))
+            if i_episode > 0:
+                score = scores / 100
+                print('100 ep mean score: {}'.format(score))
+                scores = 0
         observation = env.reset()
         state_as_buckets = tuple([QLearn.matchBucket(observation[i], bucketed_states[i]) for i in range(observation_space_dimensionality)])
         for t in range(MAX_T):
@@ -86,20 +91,22 @@ if TRAIN:
             log_message('Q[{}]={}'.format(stateaction, Q[stateaction]))
             state_as_buckets = next_state_as_buckets
             if done:
-                log_message("Episode {} finished after {} timesteps".format(i_episode, t+1))
+                log_message("Episode {} finished after {} timesteps".format(i_episode, t + 1))
+                scores += t + 1
                 break
 
     with open('Q.pkl', 'wb') as f:
         pickle.dump(Q, f)
 
 else:
-    observation = env.reset()
-    for t in range(MAX_T):
-        env.render()
-        state_as_buckets = tuple([QLearn.matchBucket(observation[i], bucketed_states[i]) for i in range(observation_space_dimensionality)])
-        pair = Q[state_as_buckets]
-        action = np.argmax(Q[state_as_buckets])
-        observation, reward, done, info = env.step(action)
-        if done:
-            print("Episode finished after {} timesteps".format(t+1))
-            break
+    for _ in range(NUM_EPISODES):
+        observation = env.reset()
+        for t in range(MAX_T):
+            env.render()
+            state_as_buckets = tuple([QLearn.matchBucket(observation[i], bucketed_states[i]) for i in range(observation_space_dimensionality)])
+            pair = Q[state_as_buckets]
+            action = np.argmax(Q[state_as_buckets])
+            observation, reward, done, info = env.step(action)
+            if done:
+                print("Episode finished after {} timesteps".format(t+1))
+                break
