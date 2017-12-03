@@ -2,15 +2,10 @@ import gym
 import numpy as np
 from QLearn import QLearn
 import pickle
-import math
-'''
-inputs: [x, x', theta, theta']
-output: 1 = right, 0 = left
-'''
 
-env = gym.make('CartPole-v0')
+env = gym.make('Snake-v0')
 
-MAX_T = 200
+MAX_T = 40000
 env._max_episode_steps = MAX_T
 
 NUM_EPISODES = 10000
@@ -41,24 +36,17 @@ def log_message(s):
     if LOG:
         print(s)
 
-TRAIN = True * False #**************************************************************************
-LOAD_PRETRAINED = True
+TRAIN = True #* False #**************************************************************************
+LOAD_PRETRAINED = False
 
 RENDER = False
 
-bucketed_states = list()
-num_buckets = [2, 2, 6, 4]
-mins = [-2.0, -0.5, -0.21, -1.0]
-maxes = [2.0, 0.5, 0.21, 1.0]
 
-observation_space_dimensionality = env.observation_space.shape[0]
-for i_dimension in range(observation_space_dimensionality):
-    bucketed_states.append(QLearn.quantized(mins[i_dimension], maxes[i_dimension], num_buckets[i_dimension]))
+Q = np.zeros(tuple(env.observation_space.n) + (env.action_space.n,))
 
-Q = np.zeros(tuple(num_buckets) + (env.action_space.n,))
 if LOAD_PRETRAINED:
     try:
-        with open('Q.pkl', 'rb') as f:
+        with open('snake_Q.pkl', 'rb') as f:
             Q = pickle.load(f)
     except FileNotFoundError:
         pass
@@ -95,7 +83,7 @@ if TRAIN:
                 scores += t + 1
                 break
 
-    with open('Q.pkl', 'wb') as f:
+    with open('snake_Q.pkl', 'wb') as f:
         pickle.dump(Q, f)
 
 else:
