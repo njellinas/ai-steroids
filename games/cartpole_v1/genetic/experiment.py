@@ -1,9 +1,9 @@
 import gym
 import numpy as np
-import sys, logging
+import logging
 
-from cartpole_v1.genetic_algorithms.population import Population
-from cartpole_v1.genetic_algorithms.algorithms import logistic
+from models.genetic_algorithms.population import Population
+from models.genetic_algorithms.algorithms import logistic
 
 # Initialize logger
 logging.basicConfig(level=logging.INFO)
