@@ -1,7 +1,10 @@
 import gym
 import numpy as np
-from QLearn import QLearn
+import math
 import pickle
+
+from QLearn import QLearn
+
 
 env = gym.make('Snake-v0')
 
@@ -46,7 +49,7 @@ Q = np.zeros(tuple(env.observation_space.n) + (env.action_space.n,))
 
 if LOAD_PRETRAINED:
     try:
-        with open('snake_Q.pkl', 'rb') as f:
+        with open('Q_table.pkl', 'rb') as f:
             Q = pickle.load(f)
     except FileNotFoundError:
         pass
@@ -83,7 +86,7 @@ if TRAIN:
                 scores += t + 1
                 break
 
-    with open('snake_Q.pkl', 'wb') as f:
+    with open('Q_table.pkl', 'wb') as f:
         pickle.dump(Q, f)
 
 else:
