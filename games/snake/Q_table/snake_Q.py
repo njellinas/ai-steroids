@@ -107,14 +107,18 @@ if TRAIN:
 else:
     for _ in range(NUM_EPISODES):
         state = env.reset()
+        rewards = 0
         for t in range(MAX_T):
             env.render()
             Q_state = [Q_of(state, action) for action in range(env.action_space.n)]
             action = np.argmax(Q_state)
             action_Q = np.amax(Q_state)
-            print(action)
-            print(action_Q)
+            if action_Q == 0:
+                action = env.action_space.sample()
+            # print(action)
+            # print(action_Q)
             state, reward, done, info = env.step(action)
+            rewards += reward
             if done:
-                print("Episode finished after {} timesteps".format(t+1))
+                print("Episode finished with {} reward".format(t+1))
                 break
